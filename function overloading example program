@@ -1,0 +1,26 @@
+// function overloading example program
+#include<iostream>
+
+int add(int x,int y) {return x + y;}
+int add(int x,int y,int z) {return x + y + z;}
+int add(int x,int y,int z,int a) {return x + y + z + a;}
+
+int main()
+{
+    int a,b,c,d;
+    a = 10;
+    b = 20;
+    c = 30;
+    d = 40;
+
+    std::cout << "a + b =         "<< add(a,b) << std::endl;
+    //std::cout << "b + c =         "<< add(b,c) << std::endl;
+    //std::cout << "c + d =         "<< add(c,d) << std::endl;
+    //std::cout << "a + d =         "<< add(a,d) << std::endl;
+    std::cout << "a + b + c =     "<< add(a,b,c) << std::endl;
+    //std::cout << "a + b + d =     "<< add(a,b,d) << std::endl;
+    //std::cout << "a + c + d =     "<< add(a,c,d) << std::endl;
+    //std::cout << "b + c + d =     "<< add(b,c,d) << std::endl;
+    std::cout << "a + b + c + d = "<< add(a,b,c,d) << std::endl;
+    
+}
