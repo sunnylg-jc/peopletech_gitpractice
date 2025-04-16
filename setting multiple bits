@@ -1,0 +1,37 @@
+//setting multiple bits
+#include <iostream>
+#include <bitset>
+
+int main() {
+    int num = 0b00000000;  // Start with all bits cleared
+    int bit_count;
+
+    std::cout << "Enter how many bits you want to set: ";
+    std::cin >> bit_count;
+
+    if (bit_count > 8) {
+        std::cout << "You can only set up to 8 bits (0–7)." << std::endl;
+        return 1;
+    }
+
+    int bits_to_set[8];  // Max 8 bits for 8-bit number
+
+    std::cout << "Enter the bit positions to set (0 to 7):" << std::endl;
+    for (int i = 0; i < bit_count; ++i) {
+        std::cin >> bits_to_set[i];
+    }
+
+    // Set the specified bits
+    for (int i = 0; i < bit_count; ++i) {
+        int bit = bits_to_set[i];
+        if (bit >= 0 && bit < 8) {
+            num |= (1 << bit);
+        } else {
+            std::cout << "Invalid bit position: " << bit << std::endl;
+        }
+    }
+
+    std::cout << "Final result: " << std::bitset<8>(num) << std::endl;
+
+    return 0;
+}
