@@ -1,0 +1,15 @@
+//setting a bit
+#include <iostream>
+#include <bitset>
+
+int main() {
+    int num = 0b00000000; // Starting with all bits OFF (0)
+    std::cout << "Original: " << std::bitset<8>(num) << std::endl;
+
+    int bit_to_set = 2;
+    num = num | (1 << bit_to_set); // Set the 2nd bit
+
+    std::cout << "After Set: " << std::bitset<8>(num) << std::endl;
+
+    return 0;
+}
