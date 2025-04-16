@@ -1,18 +1,27 @@
-#include <iostream>
-#include <bitset>
+#include<iostream>
+#include<bitset>
+int main ()
+{
+    int n = 0b00010101;
+    std::cout << std::bitset<8>(n) << std::endl;
 
-int main() {
-    int num = 0b00000100; // 4 in decimal, 2nd bit is ON
-    std::cout << "Original: " << std::bitset<8>(num) << std::endl;
+    //input for checking
+    int bit_to_check;
+    std::cin >> bit_to_check;
 
-    int bit_to_check = 2;
-    bool is_bit_set = num & (1 << bit_to_check); // Check the 2nd bit
+    //creating a masked bit 
+    int masked_bit;
+    masked_bit = (1 << bit_to_check);
+    std::cout << std::bitset<8>(masked_bit) << std::endl << std::endl;
+    if  (bit_to_check > 7)
+        std::cout << "please give the bit within the range i.e 0 to 7";
 
-    if (is_bit_set) {
-        std::cout << "Bit " << bit_to_check << " is ON" << std::endl;
-    } else {
-        std::cout << "Bit " << bit_to_check << " is OFF" << std::endl;
-    }
+    //checking a bit
+    if (n & masked_bit)
+        std::cout << "the bit is set";
+    else
+        std::cout << "the bit is not set";
 
+    
     return 0;
 }
