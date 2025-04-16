@@ -1,0 +1,15 @@
+//clear a bit
+#include <iostream>
+#include <bitset>
+
+int main() {
+    int num = 0b00000100; // 4 in decimal, 2nd bit is ON
+    std::cout << "Original: " << std::bitset<8>(num) << std::endl;
+
+    int bit_to_clear = 2;
+    num = num & ~(1 << bit_to_clear); // Clear the 2nd bit
+
+    std::cout << "After Clear: " << std::bitset<8>(num) << std::endl;
+
+    return 0;
+}
