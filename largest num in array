@@ -1,0 +1,24 @@
+#include<iostream>
+int main()
+{
+    int n;
+    std::cout << "Enter the no.of elements you want to enter:";
+    std::cin >> n;
+
+    int arr[5],largest;
+    for(int i=0;i<n;i++)
+        {
+            std::cout << "Enter the " << i << "th element " << '\n';
+            std::cin >> arr[i];
+            std::cout << "the " << i << "th element is " << arr[i] << '\n';
+        }
+
+    largest = arr[0];
+    for(int i=0;i<n;i++)
+                {
+                    if (largest < arr[i]) largest = arr[i];
+                    std::cout << "the largest element is "<< largest << std::endl;
+                }
+    std::cout << "The largest number is "<< largest;
+    return 0;
+}
