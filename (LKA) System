@@ -1,0 +1,104 @@
+#include<iostream>
+
+constexpr int LINE_CENTER = 0;
+constexpr int MAX_STEERING_ANGLE = 30;
+
+class sensor {
+public:
+    sensor() {}
+        
+    virtual void readData() = 0;
+    virtual ~sensor() {};
+};
+
+class CameraSensor : public sensor {
+private:
+    float line_offset;
+public:
+    CameraSensor() {
+        std::cout << "CameraSensor constructor called" << std::endl;
+    }
+    
+    void readData() override{
+        std::cout << "Enter line offset(how much the VECHILE is deviated from center)" << std::endl;
+        std::cin >> line_offset;
+    }
+    
+    float getOffset() const {
+        return line_offset;
+    }
+    
+    virtual ~CameraSensor() {
+        std::cout << "CameraSensor destructor is called" << std::endl;
+    }
+};
+
+
+
+class RadarSensor : public sensor {
+private:
+    int vechile_speed;
+public:
+    RadarSensor() {
+        std::cout << "RadarSensor Constructor called" << std::endl;
+    }
+    
+    void readData() override{
+        std::cout << "Enter the speed of the vechile" << std::endl;
+        std::cin >> vechile_speed;
+    }
+    
+    virtual ~RadarSensor() {
+        std::cout << "RadarSensor destructor called" << std::endl;
+    }
+    
+    int getSpeed() const {
+        return vechile_speed;
+    }
+};
+
+class LaneDetector {
+private:
+    CameraSensor* cam;
+public:
+    LaneDetector(CameraSensor* c) : cam(c) {}
+    
+    void Vechile_position() {
+        float position;
+        position = cam -> getOffset() - LINE_CENTER;
+        
+        if (position > 0) {
+            std::cout << "Your vechile is " << position << " meters to the right side of the lane" << std::endl;
+        }
+        
+        else if (position < 0) {
+            std::cout << "Your vechile is " <<  (0 - position) << " meters to the left side of the lane" << std::endl;
+        }
+        
+        else
+            std::cout << "Your vechile is on the lane" << std::endl;
+    }
+};
+
+// class Streeingcontrol {
+// private:
+//     CameraSensor* cam;
+//     RadarSensor* ras;
+// public:
+//     Streeingcontrol(CameraSensor* c , RadarSensor* s)
+// }
+
+int main()
+{
+    CameraSensor cs;
+    RadarSensor rs;
+    LaneDetector ld(&cs);
+    cs.readData();
+    rs.readData();
+    std::cout << cs.getOffset() << std::endl;
+    std::cout << rs.getSpeed() << std::endl;
+    ld.Vechile_position();
+    return 0;
+}
+
+
