@@ -1,0 +1,157 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <string>
+#include <ctime>
+#include <algorithm>
+enum class CallType { Incoming, Outgoing, Missed };
+
+class Contact {
+public:
+
+    Contact(std::string name, std::string number) : name(name), number(number) {}
+    std::string getName() const { return name; }
+    std::string getNumber() const { return number; }
+private:
+    std::string name, number;
+};                                                                              //Bug1 solved
+
+class CallHistoryEntry {
+public:
+    CallHistoryEntry(Contact contact, time_t timestamp, int duration, CallType type)
+        : contact(contact), timestamp(timestamp), duration(duration), type(type) {}
+    time_t getStartTime() const { return timestamp; }
+    CallType getType() const { return type; }
+private:
+    Contact contact;
+    time_t timestamp;
+    CallType type;
+public:
+    int duration;
+};
+
+class PhoneApplication {
+public:
+    void addContact(const Contact& contact) {
+        // Bug 2: Allow duplicate contacts
+        for (const auto& con : contacts) {
+            if (con.getNumber() == contact.getNumber()) {
+                std::cout << "Duplicate contact" << std::endl;
+                return;
+            }
+        }
+        contacts.push_back(contact);
+        std::cout << "Contact Saved" << std::endl;
+    }                                                                                          // bug 2 solved //
+    void makeCall(const std::string& number) {
+        bool foundcontact = false;
+        for (const auto& contact : contacts) {
+            if (contact.getNumber() == number) {
+                // Bug 3: Always marks call as incoming (ignores outgoing)
+                foundcontact = true;
+                currentCall = std::make_shared<CallHistoryEntry>(contact, std::time(nullptr), 0, CallType::Incoming);
+                std::cout << "Incomming call" << std::endl;
+                return;
+            }
+        }
+        if(!foundcontact) {
+            std::cout << "Outgoing Call(Unknown number)" << std::endl;
+            currentCall = std::make_shared<CallHistoryEntry>(Contact("",number), std::time(nullptr), 0, CallType::Outgoing);
+        }
+    }                                                                                                                                                                   //bug 3 sloved
+    void endCall() {
+        if (!currentCall) return;
+        // Bug 4: Incorrect duration calculation (negative value)
+        time_t endTime = std::time(nullptr);
+        int duration = endTime - currentCall->getStartTime();
+        currentCall -> duration = duration;
+        callHistory.push_back(*currentCall);
+        currentCall.reset();
+        std::cout << "Call ended" << std::endl;
+    }
+    std::vector<CallHistoryEntry> getRecentCalls(int count) {
+        // Bug 5: Sorts oldest to newest (should be newest to oldest)
+        std::sort(callHistory.begin(), callHistory.end(),[](const CallHistoryEntry& a, const CallHistoryEntry& b) {return a.getStartTime() > b.getStartTime();});
+        // Return latest 'count' entries (but sorted wrong)
+        if (count > callHistory.size()) count = callHistory.size();
+        return std::vector<CallHistoryEntry>(callHistory.end() - count, callHistory.end());
+    }
+
+    void showContacts() {
+        for (const auto& contact : contacts) {
+            std::cout << contact.getName() << " " << contact.getNumber() << std::endl;
+        }
+    }
+
+private:
+    std::vector<Contact> contacts;
+    std::vector<CallHistoryEntry> callHistory;
+    std::shared_ptr<CallHistoryEntry> currentCall;
+};
+
+int main() {
+    PhoneApplication pa;
+    int choice;
+    do {
+        std::cout << "\nPhone Application Menu:\n";
+        std::cout << "1. Add Contact\n";
+        std::cout << "2. Make Call\n";
+        std::cout << "3. End Call\n";
+        std::cout << "4. View Contacts\n";
+        std::cout << "5. View Recent Calls\n";
+        std::cout << "6. Exit\n";
+        std::cout << "Enter your choice: ";
+        std::cin >> choice;
+        if (std::cin.fail()) {
+            std::cin.clear(); // Clear error flag
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Discard invalid input
+            choice = -1; // Set to invalid choice to trigger default case
+        }
+
+
+        switch (choice) {
+        case 1: {
+            std::string name, number;
+            std::cout << "Enter contact name: ";
+            std::cin >> name;
+            std::cout << "Enter contact number: ";
+            std::cin >> number;
+            pa.addContact(Contact(name, number));
+            break;
+        }
+        case 2: {
+            std::string number;
+            std::cout << "Enter the phone number to call: ";
+            std::cin >> number;
+            pa.makeCall(number);
+            break;
+        }
+        case 3:
+            pa.endCall();
+            break;
+        case 4:
+            pa.showContacts();
+            break;
+        case 5: {
+            int count;
+            std::cout << "Enter number of recent calls to view: ";
+            std::cin >> count;
+            auto recentCalls = pa.getRecentCalls(count);
+            std::cout << "\nRecent Calls:\n";
+            for (const auto& call : recentCalls) {
+                //std::cout << "Name: " << call.getName();
+                std::cout << "Call Start Time: " << call.getStartTime() << "\n";
+                std::cout << "Call Duration: " << call.duration << " seconds\n";
+                std::cout << "Call Type: " << (call.getType() == CallType::Incoming ? "Incoming" : "Outgoing") << "\n";
+            }
+            break;
+        }
+        case 6:
+            std::cout << "Exiting the application.\n";
+            break;
+        default:
+            std::cout << "Invalid choice, please try again.\n";
+        }
+    } while (choice != 6);
+    return 0;
+}
