@@ -1,0 +1,64 @@
+#include<iostream>
+
+//1. Implementer Interface
+class Color {
+public:
+    virtual void applyColor() = 0;
+    virtual ~Color() = default;
+};
+
+// 2. Concrete Implementers
+class RedColor : public Color {
+public:
+    void applyColor() {
+        std::cout << "Red color appled";
+    }
+};
+
+class BlueColor : public Color {
+public:
+    void applyColor() {
+        std::cout << "Blue color applied";
+    }
+};
+
+//3. Abstraction (Base Class)
+class Shape {
+protected:
+    Color* color;
+public:
+    Shape(Color* c) : color(c) {}
+    virtual void drawShape() = 0;
+    virtual ~Shape() = default;
+};
+
+//4. Refined Abstractions
+class Circle : public Shape {
+public:
+    Circle(Color* c) : Shape(c) {}
+    void drawShape() {
+        std::cout << "Circle is drawn and ";
+        color -> applyColor();
+    }
+};
+
+class Square : public Shape {
+public:
+    Square(Color* c) : Shape(c) {}
+    void drawShape() {
+        std::cout << "Square is drawn and ";
+        color -> applyColor();
+    }
+};
+
+
+
+int main()
+{
+    RedColor red;
+    BlueColor blue;
+    
+    Square redSquare(&red);
+    redSquare.drawShape();
+    std::cout << std::endl;
+}
