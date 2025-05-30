@@ -1,0 +1,125 @@
+#include <iostream>
+using namespace std;
+
+// Implementation Interface
+class Device {
+public:
+    virtual bool isEnabled() const = 0;
+    virtual void enable() = 0;
+    virtual void disable() = 0;
+    virtual int getVolume() const = 0;
+    virtual void setVolume(int percent) = 0;
+    virtual int getChannel() const = 0;
+    virtual void setChannel(int channel) = 0;
+    virtual ~Device() = default;
+};
+
+// Concrete Implementation 1
+class Tv : public Device {
+private:
+    bool power = false;
+    int volume = 50;
+    int channel = 1;
+
+public:
+    bool isEnabled() const override { return power; }
+    void enable() override { power = true; cout << "TV is ON\n"; }
+    void disable() override { power = false; cout << "TV is OFF\n"; }
+    int getVolume() const override { return volume; }
+    void setVolume(int percent) override {
+        volume = percent;
+        cout << "TV volume set to " << volume << "\n";
+    }
+    int getChannel() const override { return channel; }
+    void setChannel(int ch) override {
+        channel = ch;
+        cout << "TV channel set to " << channel << "\n";
+    }
+};
+
+// Concrete Implementation 2
+class Radio : public Device {
+private:
+    bool power = false;
+    int volume = 30;
+    int channel = 88;
+
+public:
+    bool isEnabled() const override { return power; }
+    void enable() override { power = true; cout << "Radio is ON\n"; }
+    void disable() override { power = false; cout << "Radio is OFF\n"; }
+    int getVolume() const override { return volume; }
+    void setVolume(int percent) override {
+        volume = percent;
+        cout << "Radio volume set to " << volume << "\n";
+    }
+    int getChannel() const override { return channel; }
+    void setChannel(int ch) override {
+        channel = ch;
+        cout << "Radio station set to " << channel << "\n";
+    }
+};
+
+// Abstraction
+class RemoteControl {
+protected:
+    Device* device;
+
+public:
+    RemoteControl(Device* dev) : device(dev) {}
+
+    void togglePower() {
+        if (device->isEnabled()) device->disable();
+        else device->enable();
+    }
+
+    void volumeDown() {
+        int vol = device->getVolume();
+        device->setVolume(vol - 10);
+    }
+
+    void volumeUp() {
+        int vol = device->getVolume();
+        device->setVolume(vol + 10);
+    }
+
+    void channelDown() {
+        int ch = device->getChannel();
+        device->setChannel(ch - 1);
+    }
+
+    void channelUp() {
+        int ch = device->getChannel();
+        device->setChannel(ch + 1);
+    }
+};
+
+// Refined Abstraction
+class AdvancedRemoteControl : public RemoteControl {
+public:
+    AdvancedRemoteControl(Device* dev) : RemoteControl(dev) {}
+
+    void mute() {
+        device->setVolume(0);
+        cout << "Muted\n";
+    }
+};
+
+// Client Code
+int main() {
+    Tv tv;
+    RemoteControl basicRemote(&tv);
+    basicRemote.togglePower();
+    basicRemote.volumeUp();
+    basicRemote.channelUp();
+
+    cout << "----\n";
+
+    Radio radio;
+    AdvancedRemoteControl advRemote(&radio);
+    advRemote.togglePower();
+    advRemote.volumeDown();
+    advRemote.mute();
+
+    return 0;
+}
