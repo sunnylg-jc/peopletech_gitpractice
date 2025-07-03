@@ -1,0 +1,742 @@
+Android Development - Medium to Hard Conceptual & Practical Question Bank
+Set 1
+Q1: Explain how you would design an Android app with multiple screens using Activities and
+Fragments, ensuring the UI remains flexible for both phones and tablets. Describe how data
+would be passed between these components, and what role the AndroidManifest.xml plays in
+this scenario.
+Answer: Use Activities for major screens and Fragments for reusable, flexible UI blocks. On phones,
+show one Fragment at a time; on tablets, use multi-pane layouts. Pass data between Activities via
+Intents (`putExtra`), and between Fragments using Bundles or a shared ViewModel. The
+AndroidManifest.xml declares Activities, sets the launcher Activity, and configures app permissions.
+Q2: Compare ListView and RecyclerView in terms of performance, flexibility, and usage. Give
+a practical scenario where RecyclerView is preferable, and explain how the ViewHolder
+pattern improves efficiency.
+Answer: ListView is simple but less flexible; RecyclerView is more modern, supports layout
+managers, animations, and better performance using the ViewHolder pattern to recycle views.
+RecyclerView is preferable for dynamic, large lists (e.g., chat apps). The ViewHolder avoids
+repeated findViewById calls, improving scrolling performance.
+Set 2
+Q1: Describe how ConstraintLayout helps reduce view hierarchy depth compared to nested
+LinearLayout or RelativeLayout. Why is this important for app performance?
+Answer: ConstraintLayout positions elements using constraints instead of deep nesting. This flattens
+the view hierarchy, reducing layout passes and improving rendering performance, which results in
+smoother UIs.
+Q2: Explain the purpose of the Application class in Android. When and why would you
+extend it in a real app?
+Answer: The Application class manages global app state. Extend it to initialize singletons (like
+analytics, logging, Dagger graphs) before any Activity or Service starts.
+Set 3
+Q1: What is an implicit intent? Give an example of when you would use it, and explain how
+Android resolves it.
+Answer: An implicit intent does not specify a component but requests an action, like sharing text.
+Android uses Intent Filters in other apps' manifests to find matching components.
+Q2: Outline how you would handle background tasks that must run even if the app is closed
+or the device restarts. Compare Service vs. JobScheduler vs. WorkManager.
+Answer: Services handle short tasks or foreground tasks. JobScheduler schedules jobs with
+conditions like charging or network. WorkManager handles guaranteed, deferrable work that must
+persist across app restarts or reboots.
+Set 4
+Q1: How do broadcast receivers work in Android? Explain with an example of a system
+broadcast you might handle.
+Answer: Broadcast receivers listen for system or custom broadcasts. Example: Handling
+BOOT_COMPLETED to restart a background sync.
+Q2: Why are Handlers and AsyncTask used in Android? Explain how they help with thread
+management and UI updates.
+Answer: Handlers post tasks to a thread's message queue, often to the UI thread. AsyncTask runs
+background work and updates the UI thread with results. Both prevent blocking the main thread.
+Set 5
+Q1: What is Dagger, and why is dependency injection important in Android apps? Give an
+example scenario.
+Answer: Dagger is a dependency injection framework. DI reduces coupling, makes testing easier,
+and helps manage complex object creation. Example: Injecting a Repository into a ViewModel.
+Q2: Explain how LiveData and ViewModel work together in an MVVM pattern. Why is this
+pattern useful for Android apps?
+Answer: ViewModel holds UI data that survives configuration changes. LiveData notifies the UI of
+data changes. Together, they enable a clear separation of UI and logic and prevent memory leaks.
+Set 6
+Q1: Suppose an app uses multiple Fragments inside a single Activity. What issues might
+arise if Fragment transactions aren't handled correctly during screen rotations or back stack
+operations?
+Answer: Improper transactions can cause overlapping Fragments, duplicate UI, or back stack
+inconsistencies. Commit transactions before onSaveInstanceState and manage back stack properly.
+Q2: Explain how you would apply styles and themes to maintain a consistent look and feel in
+a large Android app with multiple screens.
+Answer: Define reusable styles in styles.xml, apply themes in the Manifest or Activities, use
+colorPrimary and textAppearance attributes to standardize UI elements across screens.
+Set 7
+Q1: Describe how an app might use both WorkManager and BroadcastReceiver to handle a
+daily background sync that should run only when the device is charging and connected to
+Wi-Fi.
+Answer: WorkManager can schedule periodic syncs with constraints like charging and Wi-Fi. A
+BroadcastReceiver can reschedule WorkManager tasks on BOOT_COMPLETED to persist after
+reboot.
+Q2: What are the advantages of using ConstraintLayout's chains and barriers? Give an
+example of when these features are useful.
+Answer: Chains control how views align and spread in a direction; barriers create flexible constraints
+that adjust dynamically. Example: Evenly spacing buttons or aligning to the widest TextView.
+Set 8
+Q1: Why is it bad practice to perform network calls directly on the main thread? How would
+you handle this properly in modern Android development?
+Answer: Blocking the main thread causes ANR errors. Use background threads, ExecutorService,
+Coroutines, or RxJava for network calls and update the UI on the main thread.
+Q2: Explain how you could test an Android app's broadcast receiver to ensure it correctly
+responds to a custom event.
+Answer: Use LocalBroadcastManager for local broadcasts, write a unit or instrumentation test, send
+a test Intent, and verify the receiver reacts as expected.
+Set 9
+Q1: In what scenario would you choose a GridView over a ListView or RecyclerView? Give an
+example use case.
+Answer: GridView is best for grid-like displays, such as image galleries or product grids, where rows
+and columns are needed.
+Q2: Discuss the role of Adapters in Android UI components. Why is it important to separate
+data from views using an Adapter?
+Answer: Adapters bridge data and UI, inflating layouts and binding data. This separation improves
+maintainability, flexibility, and reusability.
+Set 10
+Q1: Explain the possible memory leaks in an Android app when using Context. How can they
+be avoided in components like Adapters and AsyncTask?
+Answer: Holding Activity Context in long-lived objects can leak memory. Use Application Context
+when possible. For AsyncTask, use static inner classes and WeakReference to the Activity.
+Q2: How would you use Dagger to inject dependencies in an Android app that uses
+ViewModel and Repository?
+Answer: Create modules for Repository and ViewModelFactory. Use @Inject in ViewModel to
+request Repository. Dagger provides instances automatically, supporting testability and clean
+architecture.
+
+==== ANDROID DEVELOPMENT DETAILED CONCEPTUAL QUESTIONS CHEAT SHEET ====
+
+Q1:
+Explain the lifecycle differences between an Activity and a Fragment. How would you handle saving/restoring UI state in both?
+
+A:
+An Activity is a single screen with a UI that has its own lifecycle methods like:
+- onCreate(): Called when Activity is created.
+- onStart(): Activity becomes visible.
+- onResume(): Activity starts interacting with the user.
+- onPause(): Another Activity is coming in front, but this one is still partially visible.
+- onStop(): Activity is no longer visible.
+- onDestroy(): Activity is destroyed and removed from memory.
+
+A Fragment is like a modular section of an Activity. It can be reused inside different Activities and has its own lifecycle:
+- onAttach(): Fragment is attached to its parent Activity.
+- onCreate(): Called to do initial creation.
+- onCreateView(): Creates the Fragment’s UI.
+- onViewCreated(): Called after view creation.
+- onActivityCreated(): When Activity’s onCreate() is done.
+- onDetach(): Fragment is detached from Activity.
+
+To handle saving/restoring UI state:
+- Use onSaveInstanceState(Bundle) to save user input or state.
+- Restore the state in onCreate() for Activity or in onViewCreated() for Fragment.
+- For complex data, use a ViewModel — it survives configuration changes like screen rotation.
+
+---
+
+Q2:
+How can you ensure smooth scrolling in a RecyclerView when loading images from the internet?
+
+A:
+RecyclerView efficiently reuses item views using the ViewHolder pattern. To avoid lag:
+- Use an image loading library like Glide or Picasso which loads images asynchronously in the background thread.
+- Set placeholder images while loading to prevent flickering.
+- Enable caching so images don’t reload every time you scroll.
+- Use the proper layout manager (LinearLayoutManager or GridLayoutManager) for expected behavior.
+- Avoid heavy operations in onBindViewHolder() — keep it fast to bind only visible data.
+
+---
+
+Q3:
+What is the purpose of the Android Manifest? List at least 3 things that must be declared there.
+
+A:
+AndroidManifest.xml is the master configuration file for an Android app. It:
+1) Declares all components: Activities (screens), Services (background tasks), Broadcast Receivers (event handlers).
+   Example: Declare the MainActivity with <activity> tag.
+2) Defines permissions the app needs, like INTERNET or CAMERA. Without declaring them, the app can’t access those features.
+3) Sets the app’s theme, icon, and launcher Activity using <application> and <activity> tags.
+4) Registers Intent Filters so other apps or system can launch parts of your app via implicit intents.
+
+---
+
+Q4:
+How would you handle configuration changes (like rotation) in an Activity that displays user input without losing it?
+
+A:
+When a device rotates, the Activity is destroyed and recreated by default.
+To keep user input:
+- Save input data (like text in EditText) in onSaveInstanceState(Bundle outState).
+- Retrieve it in onCreate(Bundle savedInstanceState).
+- Use a ViewModel to store data that should survive config changes — because ViewModel is tied to the Activity/Fragment lifecycle, not to the UI.
+- For some simple UI-only cases, android:configChanges="orientation|screenSize" in Manifest can handle rotation manually, but it’s not best practice for input-heavy screens.
+
+---
+
+Q5:
+What are the advantages of using LiveData instead of callbacks for updating UI?
+
+A:
+LiveData is a lifecycle-aware observable data holder.
+Benefits:
+- Observers (like Activities or Fragments) only receive updates when they are in an active state — avoiding crashes due to null UI.
+- Prevents memory leaks because it automatically removes observers when the lifecycle owner is destroyed.
+- Decouples data source from UI — the ViewModel exposes LiveData, and the Activity just observes it.
+- Replaces custom callbacks or event buses which are harder to manage and test.
+
+---
+
+Q6:
+When would you choose to use a Foreground Service instead of a Background Service? Give a real-world example.
+
+A:
+A Foreground Service runs even if the user is not interacting with the app, but it must display a persistent notification so the user knows it’s running.
+Use Foreground Service when:
+- The task is long-running and important to the user.
+- The user expects it to keep working even in the background.
+
+Example: Music player keeps playing music even if the app is minimized. The notification lets the user control playback.
+Other examples: Fitness tracker logging GPS or a navigation app giving turn-by-turn directions.
+
+---
+
+Q7:
+How does WorkManager guarantee work is completed even if the app is killed?
+
+A:
+WorkManager is an API for deferrable background work that must be guaranteed to execute.
+How it works:
+- Uses JobScheduler (API 23+), FirebaseJobDispatcher, or AlarmManager depending on device and API level.
+- Work requests are saved in an internal database so they survive process death.
+- If device reboots, WorkManager can automatically reschedule unfinished work.
+- You can add constraints (only run on Wi-Fi, only when charging) and WorkManager will wait until they’re met.
+
+---
+
+Q8:
+Why is it recommended to use ApplicationContext instead of Activity Context in some cases? Give an example.
+
+A:
+Context gives access to app resources, services, etc.
+Activity Context is tied to the Activity lifecycle. Holding it in long-lived objects (like singletons, Adapters, or background tasks) can cause memory leaks if the Activity is destroyed but the reference remains.
+
+ApplicationContext lives for the entire lifetime of the app.
+Example: Initializing a Room database, setting up Glide image loader, or creating a singleton Logger. These don’t need Activity-specific resources so ApplicationContext is safer.
+
+---
+
+Q9:
+Explain how you could use a custom View in Android. Why might you create one?
+
+A:
+Custom Views are used when built-in widgets don’t meet your design needs.
+How to create:
+- Extend View (or a subclass like TextView).
+- Override constructors to initialize.
+- Override onDraw(Canvas canvas) to draw custom shapes or graphics.
+- Optionally handle touch events by overriding onTouchEvent().
+Example: A custom progress bar, a pie chart, or a signature pad where users draw on screen.
+
+---
+
+Q10:
+What’s the difference between synchronous and asynchronous tasks in Android? Give an example where each is used.
+
+A:
+Synchronous: Task runs on the calling thread. The thread waits until the task finishes before continuing. Blocking the main thread with long tasks is bad practice.
+Example: Reading a small local file synchronously inside onCreate().
+
+Asynchronous: Runs on a separate thread. Does not block the calling thread. When finished, it can update the UI using callbacks, LiveData, or other mechanisms.
+Example: Fetching data from the internet using Retrofit or making database queries on a background thread.
+
+==== END OF EXPANDED CHEAT SHEET ====
+
+==== ANDROID DEVELOPMENT EXPANDED CONCEPTUAL QUESTIONS CHEAT SHEET — PART 2 ====
+
+Q11:
+Explain the role of Intents in Android. What is the difference between an explicit and an implicit Intent? Give an example of each.
+
+A:
+Intents are messages used to request an action from another app component or another app.
+- Explicit Intent: Directly specifies the target component’s class name. Used within your app.
+  Example: Starting SecondActivity from MainActivity using `Intent intent = new Intent(this, SecondActivity.class);`
+- Implicit Intent: Does not name a specific component. System finds a matching component that can handle the action.
+  Example: Sharing an image: `Intent intent = new Intent(Intent.ACTION_SEND)` with MIME type set.
+
+---
+
+Q12:
+How do you pass data between Activities? How can you get a result back?
+
+A:
+Pass data:
+- Use `Intent` with `putExtra()` to attach key-value pairs.
+- Retrieve it in the target Activity using `getIntent().getExtras().getString()` or similar.
+
+To get a result back:
+- Use `startActivityForResult()` in the parent Activity to launch the child Activity.
+- In the child Activity, set result using `setResult()` and `finish()`.
+- Override `onActivityResult()` in the parent to handle returned data.
+Note: Modern way is `registerForActivityResult()` with Activity Result APIs.
+
+---
+
+Q13:
+Explain what an Adapter is in Android. Why is it important in views like ListView or RecyclerView?
+
+A:
+An Adapter acts as a bridge between a data source and a UI component that displays data (ListView, GridView, RecyclerView).
+- It creates item views and binds data to each view.
+- Adapters improve code reusability and keep UI separate from data.
+- Example: `ArrayAdapter` for ListView; `RecyclerView.Adapter` with ViewHolder for RecyclerView.
+
+---
+
+Q14:
+How can Fragments communicate with their parent Activity or other Fragments?
+
+A:
+Options:
+- Parent Activity implements an interface defined in the Fragment — Fragment calls interface method.
+- Use shared ViewModel for communication between Fragments within the same Activity.
+- Pass data using Bundle arguments when creating Fragment.
+- Use FragmentManager to find another Fragment and call its methods carefully (not recommended for tight coupling).
+
+---
+
+Q15:
+What is the purpose of the Android resource system? Give examples of different resource types.
+
+A:
+Android uses resources to define static content separate from code.
+Benefits:
+- Easier to manage layouts, strings, images for multiple devices and languages.
+Examples:
+- Layouts: XML files under res/layout.
+- Strings: res/values/strings.xml for text and translations.
+- Drawables: res/drawable for images and shapes.
+- Colors: res/values/colors.xml.
+- Styles/Themes: res/values/styles.xml.
+
+---
+
+Q16:
+Describe what happens when you click the Back button in an Android app. How can you customize this behavior?
+
+A:
+- By default, clicking Back pops the current Activity off the back stack and returns to the previous one.
+- For Fragments, it pops the Fragment from the back stack if managed using FragmentTransaction.
+To customize:
+- Override `onBackPressed()` in an Activity to add custom logic (e.g., show exit confirmation).
+- For Fragments, handle back press using `OnBackPressedDispatcher` or manage the back stack manually.
+
+---
+
+Q17:
+What is the Application class used for? How does it differ from an Activity?
+
+A:
+The Application class is the base class for maintaining global app state.
+- It is created before any Activity, Service, or Receiver is started.
+- Good place to initialize singletons like databases, loggers, or dependency injection frameworks like Dagger.
+Difference:
+- Application runs once for the app’s lifetime.
+- Activity represents a single screen — can be destroyed/recreated often.
+
+---
+
+Q18:
+How does Dagger help with Dependency Injection in Android? Explain modules and components in simple terms.
+
+A:
+Dagger is a compile-time Dependency Injection framework.
+- Modules: Classes annotated with @Module — they provide objects (dependencies).
+- Components: Interfaces annotated with @Component — they connect modules and injection targets.
+Benefit:
+- Reduces boilerplate code for creating dependencies.
+- Makes testing easier (swap real dependencies with mocks).
+Example: Module provides a Repository, Component injects it into a ViewModel.
+
+---
+
+Q19:
+What is a Broadcast Receiver? When would you use one? Give a practical example.
+
+A:
+A Broadcast Receiver listens for system-wide broadcast messages or custom app broadcasts.
+- System broadcasts: Boot completed, battery low, network change.
+- Custom: App sends an internal broadcast to update parts of the app.
+Example: Listen for BOOT_COMPLETED to start a daily background sync or notification.
+
+---
+
+Q20:
+What are Handlers used for? How does a Handler relate to a Looper and MessageQueue?
+
+A:
+Handlers manage threads and allow communication between background threads and the main UI thread.
+- Looper: Runs a message loop for a thread. The main thread has a Looper by default.
+- MessageQueue: Holds messages and tasks to be processed by Looper.
+- Handler: Posts tasks/messages to the Looper’s queue.
+Example: Post a Runnable to update UI from a background thread.
+
+==== END OF EXPANDED CHEAT SHEET PART 2 ====
+
+==== ANDROID DEVELOPMENT HARD-LEVEL QUESTIONS WITH DETAILED ANSWERS AND CODE ====
+
+Q21:
+Explain the Android Activity lifecycle in detail, including edge cases like multi-window mode and process death. How does the system restore Activity state after process kill?
+
+A:
+The Activity lifecycle consists of these main callbacks:
+
+- onCreate(): Called when Activity is first created. Initialize UI and data here.
+- onStart(): Activity becomes visible to user.
+- onResume(): Activity starts interacting with the user.
+- onPause(): Another Activity comes in front but this one is partially visible.
+- onStop(): Activity is no longer visible.
+- onDestroy(): Activity is destroyed either because user finished it or system reclaimed memory.
+
+Edge Cases:
+
+- Multi-window mode (Android N+): Activity may be visible but not focused, causing multiple lifecycle transitions (onPause/onResume) without onStop/onStart.
+- Process death: System may kill app when it is in background to reclaim resources.
+
+State restoration after process kill:
+
+- Android calls onSaveInstanceState(Bundle outState) before stopping the Activity. Save UI state (e.g., input values).
+- After process death, system recreates Activity and passes the saved Bundle to onCreate(Bundle savedInstanceState) and onRestoreInstanceState(Bundle).
+- Use this to restore UI state.
+
+Note: Non-UI data should be stored in persistent storage or ViewModel (but ViewModels don’t survive process death).
+
+Code example:
+
+@Override
+protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putString("user_input", editText.getText().toString());
+}
+
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
+    editText = findViewById(R.id.edit_text);
+
+    if (savedInstanceState != null) {
+        String savedInput = savedInstanceState.getString("user_input");
+        editText.setText(savedInput);
+    }
+}
+
+---
+
+Q22:
+Describe how the Android architecture components (ViewModel, LiveData, Room, WorkManager) work together to build a robust app. Provide a concrete example flow.
+
+A:
+These Jetpack components simplify app architecture:
+
+- ViewModel: Holds UI-related data, survives configuration changes.
+- LiveData: Observable data holder, lifecycle-aware.
+- Room: SQLite ORM, abstracts database with compile-time checks.
+- WorkManager: Schedules guaranteed background work respecting constraints.
+
+Example flow:  
+User adds a Note →  
+- UI calls ViewModel's addNote() method →  
+- ViewModel calls Repository →  
+- Repository inserts note into Room database →  
+- LiveData observes database changes →  
+- UI updates automatically →  
+- WorkManager schedules background sync to upload notes.
+
+Code snippets:
+
+ViewModel:
+
+public class NoteViewModel extends ViewModel {
+    private LiveData<List<Note>> notes;
+    private NoteRepository repository;
+
+    public NoteViewModel() {
+        repository = new NoteRepository();
+        notes = repository.getAllNotes();
+    }
+
+    public LiveData<List<Note>> getNotes() {
+        return notes;
+    }
+
+    public void addNote(Note note) {
+        repository.insert(note);
+    }
+}
+
+Room DAO:
+
+@Dao
+public interface NoteDao {
+    @Query("SELECT * FROM notes")
+    LiveData<List<Note>> getAllNotes();
+
+    @Insert
+    void insert(Note note);
+}
+
+WorkManager setup for sync:
+
+public class SyncWorker extends Worker {
+    public SyncWorker(@NonNull Context context, @NonNull WorkerParameters params) {
+        super(context, params);
+    }
+
+    @NonNull
+    @Override
+    public Result doWork() {
+        // Upload notes to server
+        return Result.success();
+    }
+}
+
+// Schedule
+WorkManager workManager = WorkManager.getInstance(context);
+PeriodicWorkRequest syncRequest = new PeriodicWorkRequest.Builder(SyncWorker.class, 12, TimeUnit.HOURS)
+    .setConstraints(new Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.UNMETERED)
+        .build())
+    .build();
+workManager.enqueueUniquePeriodicWork("notes_sync", ExistingPeriodicWorkPolicy.KEEP, syncRequest);
+
+---
+
+Q23:
+What are memory leaks in Android? Identify common sources and describe strategies/tools to detect and fix them.
+
+A:
+A memory leak happens when objects are kept in memory even though they are no longer needed, causing increased memory usage and app crashes.
+
+Common sources:  
+- Static references to Activities or Views.  
+- Inner classes or anonymous classes holding implicit references to outer classes.  
+- Handlers, Threads, or AsyncTasks holding onto Activity references.  
+- Bitmaps or large objects not properly recycled.
+
+Detection tools:  
+- Android Profiler: Monitors heap usage.  
+- LeakCanary: Open-source library that automatically detects leaks during runtime.
+
+Fix strategies:  
+- Avoid keeping long-lived references to Context; use ApplicationContext where possible.  
+- Use static inner classes and WeakReference for callbacks or Handlers.  
+- Unregister listeners and stop background tasks in lifecycle methods.  
+- Recycle bitmaps or use Glide/Picasso which manage memory efficiently.
+
+Code example (WeakReference in Handler):
+
+static class MyHandler extends Handler {
+    private final WeakReference<MyActivity> activityRef;
+
+    MyHandler(MyActivity activity) {
+        activityRef = new WeakReference<>(activity);
+    }
+
+    @Override
+    public void handleMessage(Message msg) {
+        MyActivity activity = activityRef.get();
+        if (activity != null) {
+            // Process message
+        }
+    }
+}
+
+---
+
+Q24:
+Explain the difference between SingleTop, SingleTask, and SingleInstance launch modes for Activities. When would you use each?
+
+A:
+These modes control how Activities are launched and how the back stack is managed.
+
+- singleTop:  
+  If an instance of the Activity exists at the top of the current task, no new instance is created; instead, onNewIntent() is called.  
+  Use: When Activity can handle multiple intents, like search screen.
+
+- singleTask:  
+  There is only one instance of the Activity in the entire system. If it exists in any task, that task is brought to the foreground and the intent is delivered via onNewIntent().  
+  Use: Launcher Activity or main dashboard.
+
+- singleInstance:  
+  Like singleTask but the Activity is always in its own separate task, no other activities are in the same task.  
+  Use: Apps that must be isolated, like phone dialer.
+
+Example Manifest snippet:
+
+<activity android:name=".MainActivity"
+    android:launchMode="singleTask" />
+
+---
+
+Q25:
+How does Android handle multi-threading and synchronization? Explain why AsyncTask is deprecated and what alternatives exist.
+
+A:
+Android’s main UI thread handles all user interactions. Heavy operations must run on background threads to avoid UI blocking.
+
+Synchronization tools:  
+- Handler posts tasks to threads.  
+- Executor manages thread pools.  
+- synchronized keyword for critical sections.  
+- Locks and Semaphores for complex sync.
+
+AsyncTask deprecation:  
+- Poor lifecycle awareness (can cause memory leaks).  
+- Limited API, hard to chain or cancel.  
+- Encourages bad threading practices.
+
+Alternatives:  
+- Kotlin Coroutines (recommended).  
+- RxJava for reactive streams.  
+- WorkManager for background jobs.  
+- ExecutorService for manual thread pool management.
+
+Coroutine example:
+
+lifecycleScope.launch {
+    val result = withContext(Dispatchers.IO) {
+        // Background task
+        fetchDataFromNetwork()
+    }
+    // Update UI on main thread
+    textView.text = result
+}
+
+---
+
+Q26:
+Describe the process and benefits of using Jetpack Navigation Component compared to manual Fragment transactions.
+
+A:
+Jetpack Navigation Component simplifies app navigation by:  
+- Using a navigation graph XML file that visually shows all destinations and actions.  
+- Automatically handling Fragment transactions, back stack, and animations.  
+- Supporting deep links and argument passing easily.  
+- Providing type-safe argument passing with Safe Args plugin.
+
+Benefits:  
+- Less boilerplate code compared to manual FragmentTransaction calls.  
+- Consistent and predictable navigation behavior.  
+- Easier back stack management and back button handling.
+
+Example navigation graph (nav_graph.xml):
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.HomeFragment" >
+        <action
+            android:id="@+id/action_home_to_detail"
+            app:destination="@id/detailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.example.DetailFragment" />
+</navigation>
+
+---
+
+Q27:
+What is ProGuard (or R8), and how does it affect your Android app? Explain how to configure it properly.
+
+A:
+ProGuard and R8 are tools integrated into the Android build process for code shrinking, optimization, and obfuscation.
+
+Functions:  
+- Remove unused classes, methods, and fields to reduce APK size.  
+- Rename classes and methods to obfuscated names, making reverse engineering harder.  
+- Optimize bytecode.
+
+Configuration:  
+- Enabled in build.gradle by setting minifyEnabled true.  
+- Use proguard-rules.pro file to specify keep rules for classes or methods accessed via reflection or libraries.
+
+Example keep rule to prevent obfuscation of Retrofit interfaces:
+
+-keep interface com.example.api.* { *; }
+
+Caution: Misconfiguration can cause runtime crashes due to removed or renamed classes.
+
+---
+
+Q28:
+Explain the security model of Android applications. How do permissions and app sandboxing work?
+
+A:
+Android apps run in isolated sandboxes enforced by the Linux kernel using unique UIDs. Each app runs as a separate user, so files and processes are isolated.
+
+Permissions:  
+- Declared in Manifest, e.g., android.permission.CAMERA.  
+- "Normal" permissions are granted at install.  
+- "Dangerous" permissions require runtime approval from the user (Android 6+).  
+- Scoped storage limits app access to device storage for better privacy.
+
+This model prevents apps from accessing each other's data or sensitive system features without explicit permission.
+
+---
+
+Q29:
+How would you implement offline-first behavior in an Android app? What tools and patterns would you use?
+
+A:
+Offline-first means app works fully without network and syncs changes when back online.
+
+Implementation:  
+- Use Room database as a local cache.  
+- Use Repository pattern to abstract data sources (local and remote).  
+- Use WorkManager to schedule background sync jobs.  
+- Handle conflict resolution via timestamps or version numbers.
+
+Benefits:  
+- Responsive UI without delays waiting for network.  
+- Data consistency and resilience to network failure.
+
+---
+
+Q30:
+What is the role of ContentProviders in Android? When would you create one? How does it enable data sharing?
+
+A:
+ContentProviders abstract data sources and provide a standard interface for data access.
+
+Use cases:  
+- Sharing data between apps securely, e.g., Contacts app exposes data through a ContentProvider.  
+- Encapsulating database access within an app for modularity.
+
+How it works:  
+- Implements query(), insert(), update(), delete() methods.  
+- Clients access data via ContentResolver.
+
+Example minimal ContentProvider skeleton:
+
+public class MyProvider extends ContentProvider {
+    @Override
+    public boolean onCreate() {
+        // Initialize DB here
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public Cursor query(@NonNull Uri uri, @Nullable String[] projection, @Nullable String selection,
+                        @Nullable String[] selectionArgs, @Nullable String sortOrder) {
+        // Implement query logic
+        return null;
+    }
+
+    // Implement other CRUD methods similarly
+}
+
+==== END OF HARD LEVEL DETAILED CHEAT SHEET ====
