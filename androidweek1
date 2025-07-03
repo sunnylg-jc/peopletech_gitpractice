@@ -1,0 +1,142 @@
+===== ANDROID DEVELOPMENT WEEK 1 CHEATSHEET WITH QUESTIONS & ANSWERS =====
+
+1. Android
+- Open-source OS by Google based on Linux kernel
+- Designed for touchscreen mobile devices (smartphones/tablets)
+- Uses Java/Kotlin apps running on ART/Dalvik runtime
+
+2. Android Studio
+- Official IDE for Android app development
+- Based on IntelliJ IDEA
+- Provides code editor, debugger, emulator, build tools
+
+3. Android SDK
+- Software Development Kit containing APIs and tools to build Android apps
+
+4. Android Project Structure
+
+MyApp/
+ ├─ app/
+ │   ├─ src/
+ │   │   ├─ main/
+ │   │   │   ├─ java/           # Source code (Java/Kotlin)
+ │   │   │   ├─ res/            # Resources (layouts, images, strings)
+ │   │   │   ├─ AndroidManifest.xml  # App metadata & components
+ │   │   │   └─ assets/          # Raw asset files
+ │   ├─ build.gradle            # Module build config
+ ├─ build.gradle                # Project build config
+ ├─ settings.gradle             # Project settings
+
+5. AndroidManifest.xml
+- Declares app package name, components (Activities, Services, etc.)
+- Defines permissions required by app
+- Specifies app icon, label, theme
+- Declares entry point Activity with MAIN and LAUNCHER intent filters
+
+Example:
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.myapp">
+  <application
+      android:icon="@mipmap/ic_launcher"
+      android:label="@string/app_name"
+      android:theme="@style/AppTheme">
+    <activity android:name=".MainActivity">
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>
+
+6. Activity
+- Represents a single screen with user interface
+- Hosts Views such as Button, TextView, EditText
+- Manages its own lifecycle (onCreate, onStart, onResume, etc.)
+
+7. Resources (res/)
+- XML layouts (res/layout/)
+- Drawable images (res/drawable/)
+- String values (res/values/strings.xml)
+- Colors, styles, themes (res/values/)
+
+8. Gradle
+- Build system used by Android Studio
+- Manages compiling, dependencies, APK packaging
+- Uses build.gradle files to configure builds
+
+Example build.gradle snippet:
+android {
+    compileSdkVersion 33
+    defaultConfig {
+        applicationId "com.example.myapp"
+        minSdkVersion 21
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+    }
+}
+d
+dependencies {
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+}
+
+-----
+
+QUESTIONS & ANSWERS:
+
+Q1: What is Android and why is it popular?  
+A1: Android is an open-source operating system developed by Google, based on Linux kernel. It is popular because it supports a wide variety of devices, allows developers to build apps using Java/Kotlin, and has a large ecosystem of apps and services. Its openness and flexibility attract both developers and users.
+
+Q2: What is Android Studio and what features does it provide?  
+A2: Android Studio is the official IDE for Android development. It provides a code editor with smart code completion, debugging tools, a visual layout editor, an emulator for testing apps on virtual devices, and integrates with Gradle for building APKs. It simplifies app development by providing all tools in one place.
+
+Q3: Describe the Android project folder structure.  
+A3: The main folders include:
+- `java/`: Source code files in Java or Kotlin.
+- `res/`: Resources like XML layouts, images, and strings.
+- `AndroidManifest.xml`: Describes app components and metadata.
+- `assets/`: Raw files packaged in the app.
+- `build.gradle`: Build configuration scripts.
+
+Q4: What is the purpose of AndroidManifest.xml?  
+A4: The Manifest file declares essential information to the Android OS about the app, including:
+- App package name
+- Components (Activities, Services, etc.)
+- Permissions needed
+- App icon and theme
+- Entry point Activity (with intent filters)
+
+Q5: How do you declare an Activity as the app’s launcher in the manifest?  
+A5: By adding an `<intent-filter>` with `MAIN` action and `LAUNCHER` category inside the Activity declaration, like this:
+
+```xml
+<activity android:name=".MainActivity">
+  <intent-filter>
+    <action android:name="android.intent.action.MAIN" />
+    <category android:name="android.intent.category.LAUNCHER" />
+  </intent-filter>
+</activity>
+
+Q6: What are resources in Android? Name some common types.
+A6: Resources are external files like layouts, strings, and images that are separate from code. Common types include:
+
+Layouts (res/layout/): XML files defining UI structure
+
+Drawables (res/drawable/): Images and graphic assets
+
+Strings (res/values/strings.xml): Text used in UI
+
+Colors, Styles, and Themes (res/values/)
+
+Q7: Explain the role of Gradle in Android development.
+A7: Gradle automates building the app, compiling code, packaging resources, managing dependencies (libraries), and creating APKs. It uses build scripts (build.gradle) to specify SDK versions, dependencies, and build types.
+
+Q8: What is an Activity? How does it relate to UI?
+A8: An Activity is a single screen in an Android app that the user interacts with. It contains Views (buttons, text fields) and manages their lifecycle. Each Activity represents one UI screen and can start other Activities.
+
+Q9: How does the Android system identify an app uniquely?
+A9: The app is identified uniquely by its package name declared in the AndroidManifest.xml, which acts like a namespace for the app.
+
+Q10: Why is XML used for Android layouts?
+A10: XML separates UI design from code, allowing easier management of layouts, support for multiple screen sizes, and internationalization. XML is declarative and easy to edit visually or by hand.
